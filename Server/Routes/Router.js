@@ -1,106 +1,88 @@
-const express=require('express');
-const Router=express.Router();
-const Users=require('../Models/UserSchema')
+const express = require('express');
+const Router = express.Router();
+const Users = require('../Models/UserSchema');
+const verifyToken = require('../middleware/auth');
 
-Router.post('/register',async (req, res) => {
-    const {name,email,age,mobile,work,add,desc}=req.body;
-    if(!name || !email || !age || !mobile || !work || !add || !desc)
-    {
-        res.status(404).json("plz fill the field");
+Router.post('/newuser', verifyToken, async (req, res) => {
+    const { name, email, age, mobile, work, add, desc } = req.body;
+    if (!name || !email || !age || !mobile || !work || !add || !desc) {
+        return res.status(400).json({ message: "Internal Server Error" });
     }
-    try
-    {
-        const preuser=await Users.findOne({email:email});
-        console.log(preuser);
-        if(preuser)
-        res.status(404).json("this user already exist");
-        else
-        {
-            const addUser=new Users({
-                name:name,
-                email:email,
-                age:age,
-                mobile:mobile,
-                work:work,
-                add:add,
-                desc:desc
-            });
-            await addUser.save();
-            res.status(201).json(addUser);
+    try {
+
+        const addUser = new Users({
+            name: name,
+            email: email,
+            age: age,
+            mobile: mobile,
+            work: work,
+            add: add,
+            desc: desc,
+            creator: req.user._id,
+            AddedAt: new Date(),
+        });
+
+        await addUser.save();
+        res.status(201).json(addUser);
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+Router.get('/getdata', verifyToken, async (req, res) => {
+    try {
+        if (!req.user.isAdmin) {
+            const RegisterUsers = await Users.find({ creator: req.user._id });
+            res.status(200).json(RegisterUsers);
         }
-
+        else {
+            const EmployeeEntryData = await Users.find({});
+            res.status(200).json(EmployeeEntryData);
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error" });
     }
-    catch(err)
-    {
-        res.status(404).json(err);
+});
+Router.get('/getuser/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    console.log(id);
+    try {
+        const RegisterUsers = await Users.find({ _id: id, creator: req.user._id });
+        res.status(200).json(RegisterUsers);
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+Router.patch('/updateuser/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const updateUser = await Users.findOneAndUpdate({ _id: id, creator: req.user._id }, req.body, {
+            new: true
+        });
+        if (!updateUser) {
+            return res.status(404).json({ message: 'User not found or unauthorized' });
+        }
+        updateUser.EditedAt = new Date();
+        await updateUser.save(); // Save the updated user
+        res.status(200).json(updateUser);
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
 
-
-Router.get('/getdata', async(req,res)=>{
-    try
-    {
-        const RegisterUsers=await Users.find();
-        console.log(RegisterUsers);
-        res.status(201).json(RegisterUsers);
-
+Router.delete('/deleteuser/:id', verifyToken, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deleteUser = await Users.findOneAndDelete({ _id: id, creator: req.user._id });
+        if (!deleteUser) {
+            return res.status(404).json({ message: 'User not found or unauthorized' });
+        }
+        res.status(200).json(deleteUser);
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error" });
     }
-    catch(err)
-    {
-        res.status(404).json(err);
-    }
-})
+});
 
 
-
-Router.get('/getuser/:id',async (req,res)=>{
-    try{
-        console.log(req.params);
-        const {id}=req.params;
-
-        const userIndividual=await Users.findById({_id:id});
-        console.log(userIndividual);
-        res.status(201).json(userIndividual);
-    }
-    catch(err)
-    {
-        res.status(404).json(err);
-    }
-})
-
-
-
-Router.patch('/updateuser/:id',async (req,res)=>{
-    let {id}=req.params;
-    try
-    {
-        const updateUser= await Users.findByIdAndUpdate(id,req.body,{
-            new:true
-        });
-        res.status(201).json(updateUser);
-    }
-    catch(err)
-    {
-        console.log(err);
-        res.status(404).json(updateUser);
-    }
-})
-
-
-
-Router.delete('/deleteuser/:id',async(req,res)=>{
-    try
-    {
-        const {id}=req.params;
-        const deleteUserId=await Users.findByIdAndDelete({_id:id});
-        console.log(deleteUserId);
-        res.status(201).json(deleteUserId);
-
-    }
-    catch(err)
-    {
-        res.status(404).json(err);
-    }
-})
-module.exports=Router;
+module.exports = Router;

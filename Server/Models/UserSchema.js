@@ -2,33 +2,45 @@ const mongoose = require('mongoose');
 const Schema = new mongoose.Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     email: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     age: {
         type: String,
-        require: true
+        required: true
     },
     mobile: {
         type: Number,
-        require: true
+        required: true
     },
     work: {
         type: String,
-        require: true
+        required: true
     },
     add: {
         type: String,
-        require: true
+        required: true
     },
     desc: {
         type: String,
-        require: true
+        required: true
     },
+    creator: {
+        type: String
+    },
+    AddedAt: {
+        type: Date,
+        default: null,
+    },
+    EditedAt: {
+        type: Date,
+        default: null,
+    }
 });
-const employee=new mongoose.model("employees",Schema);
-module.exports=employee;
+
+const employee = mongoose.model("employees", Schema);
+module.exports = employee;

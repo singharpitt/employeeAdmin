@@ -1,8 +1,13 @@
-import React, {  useState ,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
-import {useParams,useNavigate} from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Unauthenticated from './Unauthenticated';
+
 const Edit = () => {
-    const Navigate=useNavigate();
+    const Navigate = useNavigate();
+    const [unauthenticated, setUnauthenticated] = useState(false);
+
     const [inpval, setINP] = useState({
         name: "",
         email: "",
@@ -14,7 +19,6 @@ const Edit = () => {
     })
 
     const setdata = (e) => {
-        console.log(e.target.value);
         const { name, value } = e.target;
         setINP((preval) => {
             return {
@@ -24,59 +28,60 @@ const Edit = () => {
         })
     }
 
-    let {id}=useParams("");
-    id=id.substring(1);
-    console.log(id);
-    // const [getUserData,setUserData]=useState([]);
-    // console.log(getUserData);   
+    let { id } = useParams("");
+    id = id.substring(1);
+
     const getdata = async (e) => {
         const res = await fetch(`http://localhost:5000/getuser/${id}`, {
             method: "GET",
-            mode:"cors",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `${localStorage.getItem('user')}`
             },
         });
 
-        const data = await res.json();
-        console.log(data);
+        if (res.status === 401)
+            setUnauthenticated(true)
+        else {
+            const data = await res.json();
 
-        if (res.status === 404 || !data) {
-            console.log("error ");
-            alert("error");
+            if (res.status === 404 || !data) {
+                alert("error");
 
-        } else {
-            setINP(data);
-            console.log("data read");
+            } else {
+                setINP(data[0]);
 
+            }
         }
     }
-    useEffect(()=>{
+    useEffect(() => {
         getdata();
-    },[]);
-    
-   const updateuser=async(e)=>{
-    e.preventDefault();
-    const {name,email,work,add,mobile,desc,age}=inpval;
-    const res2=await fetch(`http://localhost:5000/updateuser/${id}`,{
-            method: "PATCH",
-            mode:"cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body:JSON.stringify({
-                name,email,mobile,work,age,desc,add
-            })
-    });
-    const data2=await res2.json();
-    console.log(data2);
-    if(res2.status===404 || !data2)
-    alert("fill data");
-    else
-    {
-        Navigate('/')
+    }, []);
+    if (unauthenticated) {
+        return <Unauthenticated />;
     }
-   }
+    const updateuser = async (e) => {
+        e.preventDefault();
+        const { name, email, work, add, mobile, desc, age } = inpval;
+        const res2 = await fetch(`http://localhost:5000/updateuser/${id}`, {
+            method: "PATCH",
+            // mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `${localStorage.getItem('user')}`
+            },
+            body: JSON.stringify({
+                name, email, mobile, work, age, desc, add
+            })
+        });
+        const data2 = await res2.json();
+        if (res2.status === 404 || !data2)
+            alert("fill data");
+        else {
+            Navigate('/')
+            toast.success("Data Updated Successfully")
+        }
+    }
 
 
     return (
@@ -113,7 +118,7 @@ const Edit = () => {
                         <textarea name="desc" value={inpval.desc} onChange={setdata} className="form-control" id="" cols="30" rows="5"></textarea>
                     </div>
 
-                    <button type="submit" onClick={updateuser}  class="btn btn-primary">Submit</button>
+                    <button type="submit" onClick={updateuser} class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
