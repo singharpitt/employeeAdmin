@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 export const getUser = () =>
     localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 export const login = async (email, password) => {
-    const { data } = await axios.post('http://localhost:5000/api/users/login', { email, password });
+    const { data } = await axios.post('https://employeeadmin-m0dp.onrender.com/api/users/login', { email, password });
     localStorage.setItem('user', JSON.stringify(data));
     return data;
 }
@@ -12,13 +12,13 @@ export const logout = () => {
 
 }
 export const getAdminData=async()=>{
-    const {data}=await axios.get('http://localhost:5000/api/users/admin',{headers:{
+    const {data}=await axios.get('https://employeeadmin-m0dp.onrender.com/api/users/admin',{headers:{
         authorization:localStorage.getItem('user')
     }});
     return data;
 }
 export const getdata=async()=>{
-    const {data}=await axios.get('http://localhost:5000/getdata',{headers:{
+    const {data}=await axios.get('https://employeeadmin-m0dp.onrender.com/getdata',{headers:{
         authorization:localStorage.getItem('user')
     }});
     return data;
@@ -27,7 +27,7 @@ export const getdata=async()=>{
 
 export const DeleteEmployee = async (id) => {
     try {
-        const { data } = await axios.delete(`http://localhost:5000/api/users/deleteemployee/${id}`, {
+        const { data } = await axios.delete(`https://employeeadmin-m0dp.onrender.com/api/users/deleteemployee/${id}`, {
             headers: {
                 Authorization: localStorage.getItem('user') 
             }
@@ -43,7 +43,7 @@ export const DeleteEmployee = async (id) => {
 
 export const UserExist=async(id)=>{
     try {
-        const { data } = await axios.get(`http://localhost:5000/api/users/userexist/${id}`);
+        const { data } = await axios.get(`https://employeeadmin-m0dp.onrender.com/api/users/userexist/${id}`);
         return data;
     } catch (error) {
         toast.error(error);
@@ -51,7 +51,7 @@ export const UserExist=async(id)=>{
 }
 
 export const updateProfile=async(updateData)=>{
-    let {data}=await axios.post('http://localhost:5000/api/users/update',updateData,{headers:{
+    let {data}=await axios.post('https://employeeadmin-m0dp.onrender.com/api/users/update',updateData,{headers:{
         authorization:localStorage.getItem('user')
     }});
     let update=JSON.parse(localStorage.getItem('user'));
@@ -61,7 +61,7 @@ export const updateProfile=async(updateData)=>{
 
 }
 export const register = async (registerData) => {
-    const { data } = await axios.post('http://localhost:5000/api/users/register', registerData);
+    const { data } = await axios.post('https://employeeadmin-m0dp.onrender.com/api/users/register', registerData);
     localStorage.setItem('user', JSON.stringify(data));
     return data;
 

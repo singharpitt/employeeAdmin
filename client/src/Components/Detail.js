@@ -19,7 +19,7 @@ const Details = () => {
     const [unauthenticated, setUnauthenticated] = useState(false);
 
     const getdata = async (e) => {
-        const res = await fetch(`http://localhost:5000/getuser/${id}`, {
+        const res = await fetch(`https://employeeadmin-m0dp.onrender.com/getuser/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

@@ -12,7 +12,7 @@ const Employee = () => {
 
     const deleteuser = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/deleteuser/${id}`, {
+            const res = await fetch(`https://employeeadmin-m0dp.onrender.com/deleteuser/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

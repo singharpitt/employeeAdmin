@@ -35,7 +35,7 @@ const Register = () => {
 
         const { name, email, work, add, mobile, desc, age } = inpval;
 
-        const res = await fetch("http://localhost:5000/newuser", {
+        const res = await fetch("https://employeeadmin-m0dp.onrender.com/newuser", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
