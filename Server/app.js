@@ -9,12 +9,7 @@ const UserLogin = require('./Routes/userRoutes')
 require('./DB/Connect');
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
-app.use(cors(
-    {
-        credentials: true,
-        origin: ['http://localhost:3000'],
-    }
-));
+app.use(cors());
 app.use('/', Router_crud);
 app.use('/api/users', UserLogin);
 app.listen(port, () => { console.log(`Server Running on Port ${port}`) });
